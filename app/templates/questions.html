@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}题库练习 - 软件测试平台{% endblock %}
+
+{% block content %}
+<section class="question-section">
+    <div class="section-heading">
+        <div>
+            <span class="section-kicker">QUESTION BANK</span>
+            <h2>题库练习</h2>
+        </div>
+        <span class="section-note">共 {{ questions | length }} 道题目</span>
+    </div>
+
+    {% if questions %}
+    <div class="question-list">
+        {% for q in questions %}
+        <a href="{{ url_for('question.question_detail', question_id=q.id) }}" class="question-list-item">
+            <div class="question-item-left">
+                <span class="question-number">{{ '%03d' | format(q.id) }}</span>
+                <div>
+                    <h3>{{ q.title }}</h3>
+                    <div class="question-tags">
+                        {% if q.question_type == 'single' %}
+                        <span class="q-tag tag-type">单选题</span>
+                        {% elif q.question_type == 'true_false' %}
+                        <span class="q-tag tag-type">判断题</span>
+                        {% endif %}
+                        {% if q.difficulty == 'easy' %}
+                        <span class="q-tag tag-easy">简单</span>
+                        {% elif q.difficulty == 'medium' %}
+                        <span class="q-tag tag-medium">中等</span>
+                        {% elif q.difficulty == 'hard' %}
+                        <span class="q-tag tag-hard">困难</span>
+                        {% endif %}
+                        {% if q.chapter %}
+                        <span class="q-tag tag-chapter">{{ q.chapter.title }}</span>
+                        {% endif %}
+                        {% if status_map and q.id in status_map %}
+                            {% if status_map[q.id] == 'correct' %}
+                            <span class="q-tag tag-answered-correct">最近答对</span>
+                            {% else %}
+                            <span class="q-tag tag-answered-wrong">最近答错</span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <span class="question-arrow">→</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>暂无题目数据。</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

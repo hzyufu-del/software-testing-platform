@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}答题记录 - 软件测试平台{% endblock %}
+
+{% block content %}
+<section class="question-section">
+    <div class="section-heading">
+        <div>
+            <span class="section-kicker">ANSWER RECORDS</span>
+            <h2>我的答题记录</h2>
+        </div>
+        <span class="section-note">共 {{ records | length }} 条记录</span>
+    </div>
+
+    {% if records %}
+    <div class="record-list">
+        {% for r in records %}
+        <div class="record-item {% if r.is_correct %}record-correct{% else %}record-wrong{% endif %}">
+            <div class="record-status">
+                {% if r.is_correct %}
+                <span class="record-dot dot-correct">✓</span>
+                {% else %}
+                <span class="record-dot dot-wrong">✗</span>
+                {% endif %}
+            </div>
+            <div class="record-body">
+                <h3>
+                    <a href="{{ url_for('question.question_detail', question_id=r.question.id) }}">
+                        {{ r.question.title }}
+                    </a>
+                </h3>
+                <div class="record-meta">
+                    <span>你的答案：<strong>{{ r.user_answer }}</strong></span>
+                    <span>正确答案：<strong>{{ r.question.correct_answer }}</strong></span>
+                    <span>{{ r.answer_time.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>暂无答题记录。</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}测试结果 - 接口实训{% endblock %}
+
+{% block content %}
+<section class="training-section">
+    <div class="section-heading">
+        <div>
+            <span class="section-kicker">TEST RESULTS</span>
+            <h2>我的测试结果</h2>
+        </div>
+        <span class="section-note">共 {{ results | length }} 条记录</span>
+    </div>
+
+    {% if results %}
+    <div class="result-list">
+        {% for r in results %}
+        <a href="{{ url_for('training.result_detail', result_id=r.id) }}" class="result-list-item">
+            <div class="result-item-left">
+                {% if r.is_passed %}
+                <span class="result-dot dot-pass">✓</span>
+                {% elif r.error_message %}
+                <span class="result-dot dot-error">!</span>
+                {% else %}
+                <span class="result-dot dot-fail">✗</span>
+                {% endif %}
+                <div>
+                    <h3>{{ r.case.case_name }}</h3>
+                    <div class="result-meta-tags">
+                        <span class="training-method method-{{ r.case.method | lower }} method-sm">{{ r.case.method }}</span>
+                        <span class="result-tag">{{ r.case.url }}</span>
+                        {% if r.response_time is not none %}
+                        <span class="result-tag">{{ r.response_time }}ms</span>
+                        {% endif %}
+                        <span class="result-tag">{{ r.execute_time.strftime('%Y-%m-%d %H:%M') }}</span>
+                    </div>
+                </div>
+            </div>
+            <span class="result-status-text {% if r.is_passed %}text-pass{% else %}text-fail{% endif %}">
+                {% if r.is_passed %}通过{% elif r.error_message %}错误{% else %}未通过{% endif %}
+            </span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>暂无测试结果，去 <a href="{{ url_for('training.task_list') }}">接口实训</a> 开始测试吧。</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

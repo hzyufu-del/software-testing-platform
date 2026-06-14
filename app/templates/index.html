@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="welcome-panel">
+    <div class="welcome-content">
+        <span class="eyebrow">SOFTWARE TESTING LAB</span>
+        <h1>软件测试学习与接口测试实训平台</h1>
+        <p>
+            {% if current_user.is_authenticated %}
+            欢迎回来，{{ current_user.username }}！继续你的学习之旅吧。
+            {% else %}
+            面向软件测试学习与实践的一体化平台，逐步覆盖理论学习、题库训练和接口测试实训。
+            {% endif %}
+        </p>
+        <div class="welcome-tags">
+            <span>Flask 应用工厂</span>
+            <span>MySQL 数据库</span>
+            <span>安全用户认证</span>
+        </div>
+    </div>
+    <div class="welcome-visual" aria-hidden="true">
+        <div class="visual-window">
+            <div class="visual-window-bar">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="visual-code-line line-long"></div>
+            <div class="visual-code-line line-medium"></div>
+            <div class="visual-chart">
+                <i></i><i></i><i></i><i></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if current_user.is_authenticated and stats %}
+<section class="content-section">
+    <div class="section-heading">
+        <div>
+            <span class="section-kicker">MY PROGRESS</span>
+            <h2>我的学习统计</h2>
+        </div>
+        <span class="section-note">基于当前学习数据</span>
+    </div>
+
+    <div class="row g-4">
+        {# ---- 课程学习 ---- #}
+        <div class="col-lg-4">
+            <article class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon icon-blue">课</div>
+                    <h3>课程学习</h3>
+                </div>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <span class="stat-value">{{ stats.completed_chapters }}</span>
+                        <span class="stat-label">已完成章节</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ stats.total_chapters }}</span>
+                        <span class="stat-label">总章节数</span>
+                    </div>
+                </div>
+                <div class="stat-progress-wrap">
+                    <div class="stat-progress-info">
+                        <span>学习进度</span>
+                        <strong>{{ stats.course_progress }}%</strong>
+                    </div>
+                    <div class="stat-progress-bar-wrap">
+                        <div class="stat-progress-bar" style="width: {{ stats.course_progress }}%"></div>
+                    </div>
+                </div>
+                <a href="{{ url_for('course.course_list') }}" class="stat-link">继续学习 →</a>
+            </article>
+        </div>
+
+        {# ---- 题库练习 ---- #}
+        <div class="col-lg-4">
+            <article class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon icon-indigo">题</div>
+                    <h3>题库练习</h3>
+                </div>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <span class="stat-value">{{ stats.total_answers }}</span>
+                        <span class="stat-label">答题总数</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ stats.correct_answers }}</span>
+                        <span class="stat-label">答对数量</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ stats.wrong_count }}</span>
+                        <span class="stat-label">错题数量</span>
+                    </div>
+                </div>
+                <div class="stat-progress-wrap">
+                    <div class="stat-progress-info">
+                        <span>正确率</span>
+                        <strong>{{ stats.accuracy }}%</strong>
+                    </div>
+                    <div class="stat-progress-bar-wrap">
+                        <div class="stat-progress-bar bar-indigo" style="width: {{ stats.accuracy }}%"></div>
+                    </div>
+                </div>
+                <a href="{{ url_for('question.question_list') }}" class="stat-link">开始练习 →</a>
+            </article>
+        </div>
+
+        {# ---- 接口实训 ---- #}
+        <div class="col-lg-4">
+            <article class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon icon-cyan">API</div>
+                    <h3>接口实训</h3>
+                </div>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <span class="stat-value">{{ stats.total_tests }}</span>
+                        <span class="stat-label">执行次数</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ stats.passed_tests }}</span>
+                        <span class="stat-label">通过次数</span>
+                    </div>
+                </div>
+                <div class="stat-progress-wrap">
+                    <div class="stat-progress-info">
+                        <span>通过率</span>
+                        <strong>{{ stats.pass_rate }}%</strong>
+                    </div>
+                    <div class="stat-progress-bar-wrap">
+                        <div class="stat-progress-bar bar-cyan" style="width: {{ stats.pass_rate }}%"></div>
+                    </div>
+                </div>
+                <a href="{{ url_for('training.task_list') }}" class="stat-link">开始实训 →</a>
+            </article>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% if not current_user.is_authenticated %}
+<section class="content-section">
+    <div class="section-heading">
+        <div>
+            <span class="section-kicker">PLATFORM MODULES</span>
+            <h2>核心功能模块</h2>
+        </div>
+        <span class="section-note">基础框架已就绪，功能持续建设中</span>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6 col-xl-4">
+            <a href="{{ url_for('course.course_list') }}" class="feature-card-link">
+                <article class="feature-card h-100">
+                    <div class="feature-icon icon-blue">课</div>
+                    <span class="status-badge badge-online">已上线</span>
+                    <h3>课程学习</h3>
+                    <p>学习软件测试基础理论、测试方法与常用工具，建立完整知识体系。</p>
+                    <span class="feature-meta">开始学习 →</span>
+                </article>
+            </a>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <a href="{{ url_for('question.question_list') }}" class="feature-card-link">
+                <article class="feature-card h-100">
+                    <div class="feature-icon icon-indigo">题</div>
+                    <span class="status-badge badge-online">已上线</span>
+                    <h3>题库练习</h3>
+                    <p>通过分类练习和结果反馈巩固知识点，为测试能力评估提供支持。</p>
+                    <span class="feature-meta">开始练习 →</span>
+                </article>
+            </a>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <a href="{{ url_for('training.task_list') }}" class="feature-card-link">
+                <article class="feature-card h-100">
+                    <div class="feature-icon icon-cyan">API</div>
+                    <span class="status-badge badge-online">已上线</span>
+                    <h3>接口实训</h3>
+                    <p>围绕 HTTP 请求、参数配置和响应断言开展接口测试实践训练。</p>
+                    <span class="feature-meta">开始实训 →</span>
+                </article>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="content-section status-section">
+    <div class="section-heading">
+        <div>
+            <span class="section-kicker">SYSTEM STATUS</span>
+            <h2>系统运行状态</h2>
+        </div>
+        <span class="section-note">基础服务接口</span>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <article class="system-card h-100">
+                <div class="system-icon system-green"><span></span></div>
+                <div class="system-copy">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <h3>服务健康检查</h3>
+                        <span class="online-badge">可用</span>
+                    </div>
+                    <p>快速确认 Flask 应用是否正常响应。</p>
+                    <code>GET /health</code>
+                </div>
+            </article>
+        </div>
+        <div class="col-lg-6">
+            <article class="system-card h-100">
+                <div class="system-icon system-blue"><span></span></div>
+                <div class="system-copy">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <h3>数据库连接检查</h3>
+                        <span class="online-badge">可用</span>
+                    </div>
+                    <p>使用 SQLAlchemy 执行测试查询，验证 MySQL 连接状态。</p>
+                    <code>GET /db-check</code>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
+

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}测试结果详情 - 接口实训{% endblock %}
+
+{% block content %}
+<section class="training-section">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb custom-breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('training.task_list') }}">接口实训</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('training.result_list') }}">测试结果</a></li>
+            <li class="breadcrumb-item active">结果 #{{ result.id }}</li>
+        </ol>
+    </nav>
+
+    <div class="result-detail-card">
+        <div class="result-detail-header {% if result.is_passed %}header-pass{% elif result.error_message %}header-error{% else %}header-fail{% endif %}">
+            <h1>{{ result.case.case_name }}</h1>
+            <span class="result-verdict">
+                {% if result.is_passed %}测试通过{% elif result.error_message %}执行错误{% else %}测试未通过{% endif %}
+            </span>
+        </div>
+
+        {% if result.error_message %}
+        <div class="result-error-box">
+            <div class="error-label">错误信息</div>
+            <p>{{ result.error_message }}</p>
+        </div>
+        {% endif %}
+
+        <div class="result-info-grid">
+            <div class="result-info-item">
+                <span class="info-label">请求方法</span>
+                <span class="training-method method-{{ result.case.method | lower }}">{{ result.case.method }}</span>
+            </div>
+            <div class="result-info-item">
+                <span class="info-label">请求地址</span>
+                <code>{{ result.case.url }}</code>
+            </div>
+            <div class="result-info-item">
+                <span class="info-label">实际状态码</span>
+                <strong>{{ result.actual_status_code if result.actual_status_code is not none else '-' }}</strong>
+            </div>
+            <div class="result-info-item">
+                <span class="info-label">响应时间</span>
+                <strong>{{ result.response_time if result.response_time is not none else '-' }} ms</strong>
+            </div>
+            <div class="result-info-item">
+                <span class="info-label">执行时间</span>
+                <span>{{ result.execute_time.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+            </div>
+        </div>
+
+        <div class="result-assertions">
+            <h3>断言结果</h3>
+            <div class="assertion-grid">
+                <div class="assertion-item {% if result.status_assert is none %}assertion-skip{% elif result.status_assert %}assertion-pass{% else %}assertion-fail{% endif %}">
+                    <span class="assertion-name">状态码断言</span>
+                    <span class="assertion-detail">
+                        预期: {{ result.case.expected_status_code or '-' }}
+                        → 实际: {{ result.actual_status_code if result.actual_status_code is not none else '-' }}
+                    </span>
+                    <span class="assertion-badge">
+                        {% if result.status_assert is none %}跳过{% elif result.status_assert %}通过{% else %}失败{% endif %}
+                    </span>
+                </div>
+                <div class="assertion-item {% if result.field_assert is none %}assertion-skip{% elif result.field_assert %}assertion-pass{% else %}assertion-fail{% endif %}">
+                    <span class="assertion-name">字段断言</span>
+                    <span class="assertion-detail">
+                        {% if result.case.expected_field %}
+                        {{ result.case.expected_field }} = 「{{ result.case.expected_value }}」
+                        {% else %}
+                        未设置
+                        {% endif %}
+                    </span>
+                    <span class="assertion-badge">
+                        {% if result.field_assert is none %}跳过{% elif result.field_assert %}通过{% else %}失败{% endif %}
+                    </span>
+                </div>
+                <div class="assertion-item {% if result.time_assert is none %}assertion-skip{% elif result.time_assert %}assertion-pass{% else %}assertion-fail{% endif %}">
+                    <span class="assertion-name">响应时间断言</span>
+                    <span class="assertion-detail">
+                        {% if result.case.max_response_time %}
+                        ≤ {{ result.case.max_response_time }}ms → 实际 {{ result.response_time or '-' }}ms
+                        {% else %}
+                        未设置
+                        {% endif %}
+                    </span>
+                    <span class="assertion-badge">
+                        {% if result.time_assert is none %}跳过{% elif result.time_assert %}通过{% else %}失败{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-params">
+            <h3>请求参数</h3>
+            <pre><code>{{ result.case.params }}</code></pre>
+        </div>
+
+        <div class="result-response">
+            <h3>响应内容</h3>
+            <pre><code>{{ result.actual_response }}</code></pre>
+        </div>
+
+        <div class="result-actions">
+            <a href="{{ url_for('training.task_detail', task_id=result.case.task_id) }}" class="btn btn-primary">
+                重新测试
+            </a>
+            <a href="{{ url_for('training.result_list') }}" class="btn btn-outline-secondary">
+                返回结果列表
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

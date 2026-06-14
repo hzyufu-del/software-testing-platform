@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}{{ chapter.title }} - 软件测试平台{% endblock %}
+
+{% block content %}
+<section class="course-section">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb custom-breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('course.course_list') }}">课程列表</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('course.course_detail', course_id=course.id) }}">{{ course.title }}</a></li>
+            <li class="breadcrumb-item active">{{ chapter.title }}</li>
+        </ol>
+    </nav>
+
+    <article class="chapter-content-card">
+        <div class="chapter-content-header">
+            <h1>{{ chapter.title }}</h1>
+            <span class="chapter-course-tag">{{ course.title }}</span>
+        </div>
+
+        <div class="chapter-content-body">
+            {{ chapter.content | safe }}
+        </div>
+
+        <div class="chapter-content-footer">
+            {% if current_user.is_authenticated %}
+                {% if is_completed %}
+                <span class="chapter-completed-label">✓ 本章已完成</span>
+                {% else %}
+                <form method="post" action="{{ url_for('course.chapter_complete', chapter_id=chapter.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-primary btn-complete">
+                        标记为已完成
+                    </button>
+                </form>
+                {% endif %}
+            {% else %}
+            <a href="{{ url_for('auth.login', next=request.path) }}" class="btn btn-outline-primary">
+                登录后标记完成
+            </a>
+            {% endif %}
+        </div>
+    </article>
+
+    <div class="chapter-nav">
+        {% if prev_ch %}
+        <a href="{{ url_for('course.chapter_detail', chapter_id=prev_ch.id) }}" class="chapter-nav-btn">
+            ← {{ prev_ch.title }}
+        </a>
+        {% else %}
+        <span></span>
+        {% endif %}
+        {% if next_ch %}
+        <a href="{{ url_for('course.chapter_detail', chapter_id=next_ch.id) }}" class="chapter-nav-btn">
+            {{ next_ch.title }} →
+        </a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

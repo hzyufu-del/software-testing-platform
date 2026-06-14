@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}课程学习 - 软件测试平台{% endblock %}
+
+{% block content %}
+<section class="course-section">
+    <div class="section-heading">
+        <div>
+            <span class="section-kicker">COURSES</span>
+            <h2>课程学习</h2>
+        </div>
+        <span class="section-note">系统学习软件测试核心知识</span>
+    </div>
+
+    {% if courses %}
+    <div class="row g-4">
+        {% for course in courses %}
+        {% set completed, total = progress_map.get(course.id, (0, 0)) %}
+        {% set pct = (completed / total * 100) | round(0) | int if total > 0 else 0 %}
+        <div class="col-md-6 col-xl-4">
+            <a href="{{ url_for('course.course_detail', course_id=course.id) }}" class="course-card-link">
+                <article class="course-card h-100">
+                    <div class="course-card-header">
+                        <span class="course-number">{{ '%02d' | format(loop.index) }}</span>
+                        {% if current_user.is_authenticated and total > 0 %}
+                        <span class="course-progress-badge {% if completed == total %}badge-done{% endif %}">
+                            {% if completed == total %}已完成{% else %}{{ completed }}/{{ total }}{% endif %}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <h3>{{ course.title }}</h3>
+                    <p>{{ course.description }}</p>
+                    {% if current_user.is_authenticated and total > 0 %}
+                    <div class="course-progress-bar-wrap">
+                        <div class="course-progress-bar" style="width: {{ pct }}%"></div>
+                    </div>
+                    {% endif %}
+                    <span class="course-meta">共 {{ total }} 章</span>
+                </article>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>暂无课程数据。</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

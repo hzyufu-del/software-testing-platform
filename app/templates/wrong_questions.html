@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}错题本 - 软件测试平台{% endblock %}
+
+{% block content %}
+<section class="question-section">
+    <div class="section-heading">
+        <div>
+            <span class="section-kicker">WRONG QUESTIONS</span>
+            <h2>我的错题本</h2>
+        </div>
+        <span class="section-note">共 {{ wrongs | length }} 道错题</span>
+    </div>
+
+    {% if wrongs %}
+    <div class="wrong-list">
+        {% for w in wrongs %}
+        <div class="wrong-item">
+            <div class="wrong-item-left">
+                <span class="wrong-count-badge">{{ w.wrong_count }}次</span>
+                <div>
+                    <h3>
+                        <a href="{{ url_for('question.question_detail', question_id=w.question.id) }}">
+                            {{ w.question.title }}
+                        </a>
+                    </h3>
+                    <div class="question-tags">
+                        {% if w.question.question_type == 'single' %}
+                        <span class="q-tag tag-type">单选题</span>
+                        {% elif w.question.question_type == 'true_false' %}
+                        <span class="q-tag tag-type">判断题</span>
+                        {% endif %}
+                        <span class="q-tag tag-wrong-time">
+                            最后答错：{{ w.last_wrong_time.strftime('%Y-%m-%d %H:%M') }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <a href="{{ url_for('question.question_detail', question_id=w.question.id, retry=1) }}" class="btn btn-sm btn-outline-primary">
+                重新练习
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>暂无错题，继续加油！</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

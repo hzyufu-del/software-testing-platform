@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}接口实训 - 软件测试平台{% endblock %}
+
+{% block content %}
+<section class="training-section">
+    <div class="section-heading">
+        <div>
+            <span class="section-kicker">API TRAINING</span>
+            <h2>接口实训</h2>
+        </div>
+        <span class="section-note">共 {{ tasks | length }} 个实训任务</span>
+    </div>
+
+    {% if tasks %}
+    <div class="row g-4">
+        {% for task in tasks %}
+        <div class="col-md-6">
+            <a href="{{ url_for('training.task_detail', task_id=task.id) }}" class="training-card-link">
+                <article class="training-card h-100">
+                    <div class="training-card-header">
+                        <span class="training-number">{{ '%02d' | format(loop.index) }}</span>
+                        <span class="training-method method-{{ task.method | lower }}">{{ task.method }}</span>
+                    </div>
+                    <h3>{{ task.title }}</h3>
+                    <p>{{ task.description }}</p>
+                    <code class="training-endpoint">{{ task.endpoint }}</code>
+                </article>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>暂无实训任务数据。</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}{{ question.title[:30] }} - 软件测试平台{% endblock %}
+
+{% block content %}
+<section class="question-section">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb custom-breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('question.question_list') }}">题库列表</a></li>
+            <li class="breadcrumb-item active">第 {{ question.id }} 题</li>
+        </ol>
+    </nav>
+
+    <div class="question-card">
+        <div class="question-card-header">
+            <div class="question-meta-row">
+                {% if question.question_type == 'single' %}
+                <span class="q-tag tag-type">单选题</span>
+                {% elif question.question_type == 'true_false' %}
+                <span class="q-tag tag-type">判断题</span>
+                {% endif %}
+                {% if question.difficulty == 'easy' %}
+                <span class="q-tag tag-easy">简单</span>
+                {% elif question.difficulty == 'medium' %}
+                <span class="q-tag tag-medium">中等</span>
+                {% elif question.difficulty == 'hard' %}
+                <span class="q-tag tag-hard">困难</span>
+                {% endif %}
+                {% if question.chapter %}
+                <span class="q-tag tag-chapter">{{ question.chapter.title }}</span>
+                {% endif %}
+            </div>
+            <h1>{{ question.title }}</h1>
+        </div>
+
+        {% if result %}
+        {# ===== Result mode: just submitted ===== #}
+        <div class="question-result {% if result.is_correct %}result-correct{% else %}result-wrong{% endif %}">
+            {% if result.is_correct %}
+            <span class="result-icon">✓</span>
+            <span>回答正确！</span>
+            {% else %}
+            <span class="result-icon">✗</span>
+            <span>回答错误，你的答案：{{ result.user_answer }}</span>
+            {% endif %}
+        </div>
+
+        {% if not result.is_correct %}
+        <div class="answer-reveal">
+            <div class="reveal-label">正确答案</div>
+            <strong class="reveal-answer">{{ result.correct_answer }}</strong>
+        </div>
+        {% endif %}
+
+        {% if result.explanation %}
+        <div class="explanation-box">
+            <div class="explanation-label">答案解析</div>
+            <p>{{ result.explanation }}</p>
+        </div>
+        {% endif %}
+
+        <div class="result-actions">
+            {% if next_id %}
+            <a href="{{ url_for('question.question_detail', question_id=next_id) }}" class="btn btn-primary">
+                下一题 →
+            </a>
+            {% else %}
+            <span class="btn btn-secondary disabled">已是最后一题</span>
+            {% endif %}
+            <a href="{{ url_for('question.question_detail', question_id=question.id, retry=1) }}" class="btn btn-outline-primary">
+                重新练习
+            </a>
+            <a href="{{ url_for('question.question_list') }}" class="btn btn-outline-secondary">
+                返回题库
+            </a>
+            {% if not result.is_correct %}
+            <a href="{{ url_for('question.wrong_questions') }}" class="btn btn-outline-danger">
+                查看错题本
+            </a>
+            {% endif %}
+        </div>
+
+        {% else %}
+        {# ===== Answer mode: show form ===== #}
+        {% if already_practiced %}
+        <div class="practice-hint">
+            你之前已练习过本题，可以重新作答。
+        </div>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('question.question_submit', question_id=question.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="option-list">
+                {% if question.option_a %}
+                <label class="option-item">
+                    <input type="radio" name="answer" value="A" required>
+                    <span class="option-letter">A</span>
+                    <span class="option-text">{{ question.option_a }}</span>
+                </label>
+                {% endif %}
+                {% if question.option_b %}
+                <label class="option-item">
+                    <input type="radio" name="answer" value="B">
+                    <span class="option-letter">B</span>
+                    <span class="option-text">{{ question.option_b }}</span>
+                </label>
+                {% endif %}
+                {% if question.option_c %}
+                <label class="option-item">
+                    <input type="radio" name="answer" value="C">
+                    <span class="option-letter">C</span>
+                    <span class="option-text">{{ question.option_c }}</span>
+                </label>
+                {% endif %}
+                {% if question.option_d %}
+                <label class="option-item">
+                    <input type="radio" name="answer" value="D">
+                    <span class="option-letter">D</span>
+                    <span class="option-text">{{ question.option_d }}</span>
+                </label>
+                {% endif %}
+            </div>
+
+            {% if current_user.is_authenticated %}
+            <button type="submit" class="btn btn-primary btn-submit-answer">提交答案</button>
+            {% else %}
+            <a href="{{ url_for('auth.login', next=request.path) }}" class="btn btn-outline-primary btn-submit-answer">
+                登录后提交答案
+            </a>
+            {% endif %}
+        </form>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

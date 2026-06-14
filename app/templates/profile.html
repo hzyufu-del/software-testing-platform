@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}个人中心 - 软件测试平台{% endblock %}
+
+{% block content %}
+<section class="profile-section">
+    <div class="profile-heading">
+        <span class="section-kicker">USER CENTER</span>
+        <h1>个人中心</h1>
+        <p>查看当前账号的基础信息与学习统计。</p>
+    </div>
+
+    <div class="profile-card">
+        <div class="profile-summary">
+            <div class="profile-avatar" aria-hidden="true">
+                {{ current_user.username[:1] | upper }}
+            </div>
+            <div>
+                <span class="profile-label">当前用户</span>
+                <h2>{{ current_user.username }}</h2>
+                <span class="role-badge">{{ current_user.role }}</span>
+            </div>
+        </div>
+
+        <div class="profile-details">
+            <div class="profile-item">
+                <span class="item-label">用户 ID</span>
+                <strong>{{ current_user.id }}</strong>
+            </div>
+            <div class="profile-item">
+                <span class="item-label">用户名</span>
+                <strong>{{ current_user.username }}</strong>
+            </div>
+            <div class="profile-item">
+                <span class="item-label">用户角色</span>
+                <strong>{{ current_user.role }}</strong>
+            </div>
+            <div class="profile-item">
+                <span class="item-label">注册时间</span>
+                <strong>{{ current_user.create_time.strftime('%Y-%m-%d %H:%M:%S') }}</strong>
+            </div>
+        </div>
+    </div>
+
+    {% if stats %}
+    <div class="profile-stats-heading">
+        <span class="section-kicker">MY PROGRESS</span>
+        <h2>学习统计</h2>
+    </div>
+
+    <div class="row g-4">
+        {# ---- 课程学习 ---- #}
+        <div class="col-lg-4">
+            <article class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon icon-blue">课</div>
+                    <h3>课程学习</h3>
+                </div>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <span class="stat-value">{{ stats.completed_chapters }}</span>
+                        <span class="stat-label">已完成章节</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ stats.total_chapters }}</span>
+                        <span class="stat-label">总章节数</span>
+                    </div>
+                </div>
+                <div class="stat-progress-wrap">
+                    <div class="stat-progress-info">
+                        <span>学习进度</span>
+                        <strong>{{ stats.course_progress }}%</strong>
+                    </div>
+                    <div class="stat-progress-bar-wrap">
+                        <div class="stat-progress-bar" style="width: {{ stats.course_progress }}%"></div>
+                    </div>
+                </div>
+                <a href="{{ url_for('course.course_list') }}" class="stat-link">继续学习 →</a>
+            </article>
+        </div>
+
+        {# ---- 题库练习 ---- #}
+        <div class="col-lg-4">
+            <article class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon icon-indigo">题</div>
+                    <h3>题库练习</h3>
+                </div>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <span class="stat-value">{{ stats.total_answers }}</span>
+                        <span class="stat-label">答题总数</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ stats.correct_answers }}</span>
+                        <span class="stat-label">答对数量</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ stats.wrong_count }}</span>
+                        <span class="stat-label">错题数量</span>
+                    </div>
+                </div>
+                <div class="stat-progress-wrap">
+                    <div class="stat-progress-info">
+                        <span>正确率</span>
+                        <strong>{{ stats.accuracy }}%</strong>
+                    </div>
+                    <div class="stat-progress-bar-wrap">
+                        <div class="stat-progress-bar bar-indigo" style="width: {{ stats.accuracy }}%"></div>
+                    </div>
+                </div>
+                <a href="{{ url_for('question.question_list') }}" class="stat-link">开始练习 →</a>
+            </article>
+        </div>
+
+        {# ---- 接口实训 ---- #}
+        <div class="col-lg-4">
+            <article class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon icon-cyan">API</div>
+                    <h3>接口实训</h3>
+                </div>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <span class="stat-value">{{ stats.total_tests }}</span>
+                        <span class="stat-label">执行次数</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ stats.passed_tests }}</span>
+                        <span class="stat-label">通过次数</span>
+                    </div>
+                </div>
+                <div class="stat-progress-wrap">
+                    <div class="stat-progress-info">
+                        <span>通过率</span>
+                        <strong>{{ stats.pass_rate }}%</strong>
+                    </div>
+                    <div class="stat-progress-bar-wrap">
+                        <div class="stat-progress-bar bar-cyan" style="width: {{ stats.pass_rate }}%"></div>
+                    </div>
+                </div>
+                <a href="{{ url_for('training.task_list') }}" class="stat-link">开始实训 →</a>
+            </article>
+        </div>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

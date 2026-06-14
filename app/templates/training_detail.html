@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}{{ task.title }} - 接口实训{% endblock %}
+
+{% block content %}
+<section class="training-section">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb custom-breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('training.task_list') }}">接口实训</a></li>
+            <li class="breadcrumb-item active">{{ task.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="training-detail-header">
+        <div class="d-flex align-items-center gap-3 mb-3">
+            <span class="training-method method-{{ task.method | lower }} method-lg">{{ task.method }}</span>
+            <div>
+                <h1>{{ task.title }}</h1>
+                <code class="training-endpoint-light">{{ task.endpoint }}</code>
+            </div>
+        </div>
+        <p>{{ task.description }}</p>
+    </div>
+
+    {% if task.request_example or task.expected_example %}
+    <div class="training-examples mb-4">
+        {% if task.request_example %}
+        <div class="example-box">
+            <div class="example-label">请求示例</div>
+            <pre><code>{{ task.request_example }}</code></pre>
+        </div>
+        {% endif %}
+        {% if task.expected_example %}
+        <div class="example-box">
+            <div class="example-label">预期结果</div>
+            <pre><code>{{ task.expected_example }}</code></pre>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="training-form-card">
+        <h2>填写测试用例</h2>
+        <form method="post" action="{{ url_for('training.task_run', task_id=task.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="mb-3">
+                <label for="case_name" class="form-label">用例名称</label>
+                <input type="text" class="form-control" id="case_name" name="case_name"
+                       value="{{ task.title }} - 正常测试" required>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <label for="method" class="form-label">请求方法</label>
+                    <select class="form-select" id="method" name="method">
+                        <option value="GET" {% if task.method == 'GET' %}selected{% endif %}>GET</option>
+                        <option value="POST" {% if task.method == 'POST' %}selected{% endif %}>POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                    </select>
+                </div>
+                <div class="col-md-8">
+                    <label for="url" class="form-label">请求地址</label>
+                    <input type="text" class="form-control" id="url" name="url"
+                           value="{{ task.endpoint }}" required placeholder="/mock/login">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="headers" class="form-label">请求头 (JSON)</label>
+                <textarea class="form-control font-monospace" id="headers" name="headers"
+                          rows="2" placeholder='{"Content-Type": "application/json"}'>{}</textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="params" class="form-label">请求参数 (JSON)</label>
+                <textarea class="form-control font-monospace" id="params" name="params"
+                          rows="3" placeholder='{"username": "admin", "password": "123456"}'>{{ task.request_example }}</textarea>
+            </div>
+
+            <hr class="my-4">
+            <h5>断言条件</h5>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <label for="expected_status_code" class="form-label">预期状态码</label>
+                    <input type="number" class="form-control" id="expected_status_code"
+                           name="expected_status_code" value="200" placeholder="200">
+                </div>
+                <div class="col-md-4">
+                    <label for="expected_field" class="form-label">预期字段名</label>
+                    <input type="text" class="form-control" id="expected_field"
+                           name="expected_field" placeholder="message">
+                </div>
+                <div class="col-md-4">
+                    <label for="expected_value" class="form-label">预期字段值</label>
+                    <input type="text" class="form-control" id="expected_value"
+                           name="expected_value" placeholder="登录成功">
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="max_response_time" class="form-label">最大响应时间 (ms)</label>
+                <input type="number" class="form-control" id="max_response_time"
+                       name="max_response_time" placeholder="3000" style="max-width: 200px;">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-training-submit">
+                执行测试
+            </button>
+        </form>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.title }} - 软件测试平台{% endblock %}
+
+{% block content %}
+<section class="course-section">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb custom-breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('course.course_list') }}">课程列表</a></li>
+            <li class="breadcrumb-item active">{{ course.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="course-detail-header">
+        <div>
+            <span class="section-kicker">COURSE</span>
+            <h1>{{ course.title }}</h1>
+            <p>{{ course.description }}</p>
+        </div>
+        {% set completed, total = progress %}
+        {% set pct = (completed / total * 100) | round(0) | int if total > 0 else 0 %}
+        {% if current_user.is_authenticated and total > 0 %}
+        <div class="course-detail-progress">
+            <div class="progress-ring" data-pct="{{ pct }}">
+                <span>{{ pct }}%</span>
+            </div>
+            <small>{{ completed }}/{{ total }} 章已完成</small>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if chapters %}
+    <div class="chapter-list">
+        {% for ch in chapters %}
+        {% set done = ch.id in completed_ids %}
+        <div class="chapter-item {% if done %}chapter-done{% endif %}">
+            <div class="chapter-item-left">
+                <span class="chapter-status-dot {% if done %}dot-done{% endif %}">
+                    {% if done %}✓{% else %}{{ loop.index }}{% endif %}
+                </span>
+                <div>
+                    <h3>
+                        <a href="{{ url_for('course.chapter_detail', chapter_id=ch.id) }}">{{ ch.title }}</a>
+                    </h3>
+                </div>
+            </div>
+            <div class="chapter-item-right">
+                {% if done %}
+                <span class="chapter-done-badge">已完成</span>
+                {% else %}
+                <a href="{{ url_for('course.chapter_detail', chapter_id=ch.id) }}" class="btn btn-sm btn-outline-primary">
+                    继续学习
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>该课程暂无章节内容。</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
